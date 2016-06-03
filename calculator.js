@@ -347,7 +347,6 @@
     {
         var displayText = display.text();
         var displayTextLength = displayText.length;
-        console.log(displayText[displayTextLength-1]);
         switch(displayText[displayTextLength-1]) {
             case '+':
                 return false;
@@ -396,25 +395,15 @@
                 }
         }
     }
-    function checkPlusMinusPossibility(display)
-    {
-        var displayText = display.text();
-        var displayTextLength = displayText.length;
-        return true;
-    }
     function updateDisplay()
     {
 
 
         var display = container.find('#displayPanel');
-
-
-
           switch($(this).text()) {
               // backspace pressed
               case '':
                   display.text(display.text().substr(0, display.text().length - 1));
-                  console.log('Backspace pressed');
                   break;
               case '()':
                   if(openBraceNesting)
@@ -475,9 +464,7 @@
               case '+/-':
                   if(lastNumberAvailability(display.text()))
                   {
-                      console.log('Available');
                                   if(isLastNumberPositive(display.text())) {
-                                      console.log('Positive');
                                       var text = changeLastNumberToNegative(display.text());
                                       display.text(text);
                                   }
@@ -489,11 +476,18 @@
                   }
                   break;
               case '=':
-                  var res = eval(display.text());
-                  display.text(display.text() + '=' + res);
+                  try
+                  {
+                      var res = eval(display.text());
+                      display.text(display.text() + '=' + res);
+                  }
+                  catch(e)
+                  {
+                      console.log('Wrong Format');
+                  }
+
                   break;
               default:
-                  //console.log($(this).text());
                   display.text(display.text() + $(this).text());
           }
     }
