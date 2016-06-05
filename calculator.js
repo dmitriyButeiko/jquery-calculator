@@ -3,8 +3,8 @@
 
     $.fn.calculator = init;
     var container = {};
-    var newSession = true;
     var openBraceNesting = 0;
+    var equalsUsed = false;
     function customizeContainer(container)
     {
          container.css({
@@ -24,11 +24,12 @@
                         'width' : '35px',
                         'padding' : '0px',
                         'display' : 'inline-block',
-                        'padding-top' : '13px'
+                        'padding-top' : '14px',
+                        'margin-right' : '4px'
                     });
                     key.css({
                         'position' : 'relative',
-                        'top'      : '5px'
+                        'top'      : '6.1px'
                     });
                     break;
                 default:
@@ -92,6 +93,7 @@
     }
     function isLastNumberPositive(text)
     {
+        console.log('First Changing');
         for(var i = (text.length-1);i>(-1);i--)
         {
             switch(text[i])
@@ -130,41 +132,18 @@
                 break;
             }
         }
+
+
+        console.log('First Changing');
+
+
+
+
          openBraceNesting--;
         var firstPart = result.substr(0,i-1);
         var secondPart = result.substr(i+1,result.length);
         result  = firstPart + secondPart;
         return result;
-    }
-    function changeLastNumberToNegative(text)
-    {
-        var result = text;
-        for(var i = (result.length - 1);i>0;i--)
-        {
-            if(result[i] == '-')
-            {
-                console.log(i);
-                break;
-            }
-        }
-
-
-        openBraceNesting++;
-        if(i == 0)
-        {
-            var firstPart = '(-';
-            var lastPart = text;
-            var res = firstPart + lastPart;
-            return res;
-        }
-
-
-
-        var firstPart = result.substr(0,i+1);
-        var middlePart = '(-';
-        var lastPart = result.substr(i+1,result.length - 1);
-        var res = firstPart + middlePart + lastPart;
-        return res;
     }
     function createPanels(container)
     {
@@ -174,8 +153,10 @@
             height : '30%',
             background : 'black',
             'font-family' : "'Sigmar One', cursive",
+            'font-size'   : '2em',
             'word-wrap'   : 'break-word',
-            color      : 'white'
+            color      : 'white',
+            'overflow-y' : 'auto'
         });
         var keysPanel    = $('<div id="keysPanel"></div>');
         keysPanel.css({
@@ -221,31 +202,30 @@
     function changeLastNumberToNegative(text)
     {
         var result = text;
-        for(var i = (result.length - 1);i>0;i--)
+        var resolved = false;
+        for(var i = (result.length-1);i>-1;i--)
         {
-            if(result[i] == '-')
+
+            switch(result[i])
             {
-                console.log(i);
+                case '-':
+                case '+':
+                case 'X':
+                case '%':
+                case '(':
+                    resolved = true;
+                    break;
+            }
+            if(resolved)
+            {
                 break;
             }
         }
-
-
-
-        if(i == 0)
-        {
-            var firstPart = '(-';
-            var lastPart = text;
-            var res = firstPart + lastPart;
-            return res;
-        }
-
-
-
-        var firstPart = result.substr(0,i+1);
+        openBraceNesting++;
+        var startPart = result.substr(0,i+1);
         var middlePart = '(-';
-        var lastPart = result.substr(i+1,result.length - 1);
-        var res = firstPart + middlePart + lastPart;
+        var lastPart = result.substr(i+1);
+        var res = startPart + middlePart + lastPart;
         return res;
     }
     function addHandlers()
@@ -275,6 +255,15 @@
                 }
         }
     }
+
+    function clearDisplay(display)
+    {
+        equalsUsed = false;
+        openBraceNesting = 0;
+        display.text('');
+    }
+
+
 
     function checkDotPossibility(display)
     {
@@ -314,6 +303,15 @@
                     return true;
                 }
         }
+    }
+    function prepareText(text)
+    {
+        var res = text.replace('X','*');
+
+        res = res.replace('%','/');
+
+
+        return res;
     }
     function checkOpenBracePossibility(display)
     {
@@ -403,6 +401,21 @@
           switch($(this).text()) {
               // backspace pressed
               case '':
+                  if(equalsUsed)
+                  {
+                      clearDisplay(display);
+                  }
+                  var displayText = display.text();
+                  if(displayText[displayText.length-1] == ')')
+                  {
+                      console.log('Nesting++');
+                      openBraceNesting++;
+                  }
+                  if(displayText[displayText.length-1] == '(')
+                  {
+                      console.log('Nesting--');
+                      openBraceNesting--;
+                  }
                   display.text(display.text().substr(0, display.text().length - 1));
                   break;
               case '()':
@@ -429,7 +442,7 @@
                   }
                   break;
               case 'C' :
-                  display.text('');
+                  clearDisplay(display);
                   break;
               case '-':
                   if(checkCharacterPossibility(display))
@@ -462,24 +475,38 @@
                   }
                   break;
               case '+/-':
+                  if(equalsUsed)
+                  {
+                      clearDisplay(display)
+                  }
                   if(lastNumberAvailability(display.text()))
                   {
+                        console.log('Available');
                                   if(isLastNumberPositive(display.text())) {
+                                      console.log('Available Positive');
                                       var text = changeLastNumberToNegative(display.text());
                                       display.text(text);
                                   }
                                   else
                                   {
+                                      console.log('Negative');
                                       var text = changeLastNumberToPositive(display.text());
                                       display.text(text);
                                   }
+                  }
+                  else
+                  {
+                      console.log('Not Available');
                   }
                   break;
               case '=':
                   try
                   {
-                      var res = eval(display.text());
+                      var text = display.text();
+                      text = prepareText(text);
+                      var res = eval(text);
                       display.text(display.text() + '=' + res);
+                      equalsUsed = true;
                   }
                   catch(e)
                   {
@@ -488,7 +515,12 @@
 
                   break;
               default:
-                  display.text(display.text() + $(this).text());
+                 var displayText = display.text();
+
+                  if(!(displayText[displayText.length-1] == ')'))
+                  {
+                      display.text(display.text() + $(this).text());
+                  }
           }
     }
     function addUI()
@@ -496,10 +528,8 @@
         customizeContainer(container);
         createPanels(container);
     }
-    function init()
+    function init(parameters)
     {
-        container = this;
-
         addUI();
         addHandlers();
     }
