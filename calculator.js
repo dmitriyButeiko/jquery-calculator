@@ -530,6 +530,7 @@
     }
     function init(parameters)
     {
+        container = this;
         addUI();
         addHandlers();
     }
