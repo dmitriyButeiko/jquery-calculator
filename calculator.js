@@ -1,10 +1,9 @@
 (function($){
-
-
     $.fn.calculator = init;
     var container = {};
     var openBraceNesting = 0;
     var equalsUsed = false;
+    
     function customizeContainer(container)
     {
          container.css({
@@ -13,7 +12,7 @@
              'height'           : '530px'
           });
     }
-    function addKey(container,keyValue)
+    function addKey(container, keyValue)
     {
             var key;
             switch(keyValue)
@@ -68,33 +67,34 @@
     }
     function addKeys(keysPanel)
     {
-        addKey(keysPanel,'C');
-        addKey(keysPanel,'%');
-        addKey(keysPanel,'X');
-        addKey(keysPanel,'backspace');
-        addKey(keysPanel,'7');
-        addKey(keysPanel,'8');
-        addKey(keysPanel,'9');
-        addKey(keysPanel,'-');
-        addKey(keysPanel,'4');
-        addKey(keysPanel,'5');
-        addKey(keysPanel,'6');
-        addKey(keysPanel,'+');
-        addKey(keysPanel,'1');
-        addKey(keysPanel,'2');
-        addKey(keysPanel,'3');
-        addKey(keysPanel,'()');
-        addKey(keysPanel,'0');
-        addKey(keysPanel,'.');
-        addKey(keysPanel,'+/-');
-        addKey(keysPanel,'=');
+        addKey(keysPanel, 'C');
+        addKey(keysPanel, '%');
+        addKey(keysPanel, 'X');
+        addKey(keysPanel, 'backspace');
+        addKey(keysPanel, '7');
+        addKey(keysPanel, '8');
+        addKey(keysPanel, '9');
+        addKey(keysPanel, '-');
+        addKey(keysPanel, '4');
+        addKey(keysPanel, '5');
+        addKey(keysPanel, '6');
+        addKey(keysPanel, '+');
+        addKey(keysPanel, '1');
+        addKey(keysPanel, '2');
+        addKey(keysPanel, '3');
+        addKey(keysPanel, '()');
+        addKey(keysPanel, '0');
+        addKey(keysPanel, '.');
+        addKey(keysPanel, '+/-');
+        addKey(keysPanel, '=');
 
 
     }
     function isLastNumberPositive(text)
     {
         console.log('First Changing');
-        for(var i = (text.length-1);i>(-1);i--)
+        
+        for(var i = (text.length - 1); i > (-1); i--)
         {
             switch(text[i])
             {
@@ -102,7 +102,6 @@
                     return true;
                     break;
                 case '-':
-
                     if(text[i-1] == '(')
                     {
                         return false;
@@ -111,6 +110,7 @@
                     {
                         return true;
                     }
+                    
                     break;
                 case '%':
                     return true;
@@ -120,6 +120,7 @@
                     break;
             }
         }
+        
         return true;
     }
     function changeLastNumberToPositive(text)
@@ -133,21 +134,17 @@
             }
         }
 
-
-        console.log('First Changing');
-
-
-
-
-         openBraceNesting--;
-        var firstPart = result.substr(0,i-1);
-        var secondPart = result.substr(i+1,result.length);
+        openBraceNesting--;
+        var firstPart = result.substr(0, i-1);
+        var secondPart = result.substr(i+1, result.length);
         result  = firstPart + secondPart;
+        
         return result;
     }
     function createPanels(container)
     {
         var displayPanel = $('<div id="displayPanel"></div>');
+        
         displayPanel.css({
             width : '100%',
             height : '30%',
@@ -158,7 +155,9 @@
             color      : 'white',
             'overflow-y' : 'auto'
         });
+        
         var keysPanel    = $('<div id="keysPanel"></div>');
+        
         keysPanel.css({
             width : '100%',
             height : '70%',
@@ -168,13 +167,6 @@
 
 
         addKeys(keysPanel);
-
-
-
-
-
-
-
         container.append(displayPanel);
         container.append(keysPanel);
     }
@@ -193,6 +185,7 @@
                 updateDisplay.call(this);
             });
         });
+        
         keysPanel.mouseout(function () {
             $(this).find('.key').unbind('mousedown');
             $(this).find('.key').unbind('mouseup');
@@ -203,9 +196,9 @@
     {
         var result = text;
         var resolved = false;
+        
         for(var i = (result.length-1);i>-1;i--)
         {
-
             switch(result[i])
             {
                 case '-':
@@ -216,16 +209,19 @@
                     resolved = true;
                     break;
             }
+            
             if(resolved)
             {
                 break;
             }
         }
+        
         openBraceNesting++;
         var startPart = result.substr(0,i+1);
         var middlePart = '(-';
         var lastPart = result.substr(i+1);
         var res = startPart + middlePart + lastPart;
+        
         return res;
     }
     function addHandlers()
@@ -262,15 +258,12 @@
         openBraceNesting = 0;
         display.text('');
     }
-
-
-
+    
     function checkDotPossibility(display)
     {
         var displayText = display.text();
         var displayTextLength = displayText.length;
-
-
+        
         switch(displayText[displayTextLength-1])
         {
             case '+':
@@ -307,9 +300,7 @@
     function prepareText(text)
     {
         var res = text.replace('X','*');
-
         res = res.replace('%','/');
-
 
         return res;
     }
@@ -317,6 +308,7 @@
     {
         var displayText = display.text();
         var displayTextLength = displayText.length;
+        
         switch(displayText[displayTextLength-1]) {
             case '+':
                 return true;
@@ -338,6 +330,7 @@
                 {
                     return true;
                 }
+                
                 return false;
         }
     }
@@ -345,7 +338,9 @@
     {
         var displayText = display.text();
         var displayTextLength = displayText.length;
-        switch(displayText[displayTextLength-1]) {
+        
+        switch(displayText[displayTextLength-1]) 
+        {
             case '+':
                 return false;
                 break;
@@ -364,12 +359,12 @@
             default:
                 return true;
         }
-
     }
     function checkCharacterPossibility(display)
     {
         var displayText = display.text();
         var displayTextLength = displayText.length;
+        
         switch(displayText[displayTextLength-1]) {
             case '+':
                 return false;
@@ -395,8 +390,6 @@
     }
     function updateDisplay()
     {
-
-
         var display = container.find('#displayPanel');
           switch($(this).text()) {
               // backspace pressed
